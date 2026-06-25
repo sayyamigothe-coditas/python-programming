@@ -1,4 +1,3 @@
-from fastapi import FastAPI
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
@@ -28,7 +27,7 @@ class Employee(Base):
     name = Column(String)
     department_id = Column(Integer, ForeignKey("departments.id"))
     
-    #back populates is used so the cahnges in one table should be visible also in another table
+    #back populates is used so the chnages in one table should be visible also in another table
     department = relationship("Department", back_populates="employees")
 
 
