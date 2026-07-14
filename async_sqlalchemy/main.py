@@ -1,5 +1,3 @@
-import asyncio
-
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 

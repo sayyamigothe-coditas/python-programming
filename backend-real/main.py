@@ -2,10 +2,10 @@ from fastapi import FastAPI
 import sqlite3
 from pydantic import BaseModel
 
-app=FastAPI()
+app = FastAPI()
 
-connection=sqlite3.connect("users.db",check_same_thread=False)
-cursor=connection.cursor()
+connection = sqlite3.connect("users.db", check_same_thread=False)
+cursor = connection.cursor()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
@@ -17,60 +17,49 @@ CREATE TABLE IF NOT EXISTS users (
 
 connection.commit()
 
-@app.get('/')
+
+@app.get("/")
 def home():
     return "fast api started"
 
 
-#like interface
+# like interface
 class User(BaseModel):
-    name:str
-    email:str
+    name: str
+    email: str
 
 
+@app.post("/users")
+def create_user(user: User):
+    cursor.execute("insert into users(name,email) values(?,?)", (user.name, user.email))
+    connection.commit()
+    return {"message": "created successfully"}
 
-@app.post('/users')
-def create_user(user:User):
 
-  cursor.execute("insert into users(name,email) values(?,?)",(user.name,user.email))
-
-  connection.commit()
-
-  return { "message":"created successfully"}
-
-#get all users
-
+# get all users
 @app.get("/users")
 def getAllUsers():
-   
-   cursor.execute("select * from users")
+    cursor.execute("select * from users")
+    users = cursor.fetchall()
+    connection.commit()
 
-   users=cursor.fetchall()
+    return users
 
-   connection.commit()
 
-   return users
-
-#get user by id
+# get user by id
 @app.get("/users/{user_id}")
 def get_user(user_id: int):
 
-    cursor.execute(
-        "SELECT * FROM users WHERE id = ?",
-        (user_id,)
-    )
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
 
     user = cursor.fetchone()
 
     return user
 
-#update user
+
+# update user
 @app.put("/users/{user_id}")
-def update_user(
-    user_id: int,
-    name: str,
-    email: str
-):
+def update_user(user_id: int, name: str, email: str):
 
     cursor.execute(
         """
@@ -78,27 +67,20 @@ def update_user(
         SET name = ?, email = ?
         WHERE id = ?
         """,
-        (name, email, user_id)
+        (name, email, user_id),
     )
 
     connection.commit()
 
-    return {
-        "message": "User Updated Successfully"
-    }
+    return {"message": "User Updated Successfully"}
 
-#delte the users
+
+# delte the users
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int):
 
-    cursor.execute(
-        "DELETE FROM users WHERE id = ?",
-        (user_id,)
-    )
+    cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
 
     connection.commit()
-    
 
-    return {
-        "message": "User Deleted Successfully"
-    }
+    return {"message": "User Deleted Successfully"}
