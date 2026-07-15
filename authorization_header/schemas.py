@@ -1,16 +1,15 @@
-from sqlalchemy import Column, Integer, String
-from database import Base
+from pydantic import BaseModel
+from pydantic import EmailStr
 
+class UserCreate(BaseModel):
+    email: EmailStr
+    name: str
+    password: str
 
-class User(Base):
-    __tablename__ = "users"
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)
-    email = Column(String, unique=True)
-    password = Column(String)
-
-
-def get_user_by_id(db, user_id):
-
-    return db.query(User).filter(User.id == user_id).first()
+class Token(BaseModel):
+    access_token: str
+    token_type: str
